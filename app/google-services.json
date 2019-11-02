@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "747882540658",
+    "firebase_url": "https://swachbharat-52579.firebaseio.com",
+    "project_id": "swachbharat-52579",
+    "storage_bucket": "swachbharat-52579.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:747882540658:android:fb2bc6b76507f5a187dceb",
+        "android_client_info": {
+          "package_name": "com.india.swachhbharat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "747882540658-n5sbgbscb6iesaceat1fblbl1bq3gbod.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvkznmIfMIAU72UcfLTyd8TrqEcanEkhI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "747882540658-n5sbgbscb6iesaceat1fblbl1bq3gbod.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
