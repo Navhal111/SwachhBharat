@@ -7,44 +7,52 @@
     android:layout_width="match_parent"
     android:layout_marginStart="20dp"
     android:layout_marginEnd="20dp"
-    android:layout_height="match_parent"
-
-    tools:context=".ComplainRegister">
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/des_holder"
-        android:hint="Description"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    android:layout_height="match_parent">
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_image"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        app:cardUseCompatPadding="true"
+        android:layout_height="wrap_content"
+        app:cardElevation="3dp"
+        >
 
-        <EditText
+        <LinearLayout
+            android:layout_margin="5dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+        <TextView
+            android:id="@+id/post_username"
+            android:textSize="18dp"
+            android:layout_marginBottom="5dp"
+            android:text="UserName:- "
+            android:textColor="@color/colorAccent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
             android:id="@+id/description"
+            android:textSize="18dp"
+            android:layout_marginBottom="5dp"
+            android:text="Description:- "
+            android:textColor="@color/colorAccent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"/>
+            android:layout_height="wrap_content" />
 
-    </com.google.android.material.textfield.TextInputLayout>
-
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/landmark_holder"
-        android:hint="Landmark"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/landmark"
+        <TextView
+            android:id="@+id/adress"
+            android:textSize="18dp"
+            android:layout_marginBottom="5dp"
+            android:text="Landmark:- "
+            android:textColor="@color/colorAccent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"/>
+            android:layout_height="wrap_content" />
 
-    </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
 
     <TextView
         android:id="@+id/tyextmain"
@@ -77,7 +85,7 @@
         android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Submit"
+        android:text="Solve"
         android:textColor="@color/white"
         android:textAllCaps="false"
         android:textSize="16sp" />

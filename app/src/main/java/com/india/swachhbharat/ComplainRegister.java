@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,6 +20,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.util.Printer;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -31,6 +33,12 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,19 +47,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.india.dataset.Complain;
 
-public class ComplainRegister extends AppCompatActivity implements LocationListener {
+public class ComplainRegister extends AppCompatActivity implements LocationListener , OnMapReadyCallback {
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
     private Button submit;
-    EditText description;
-    private FusedLocationProviderClient mFusedLocationClient;
-    private SettingsClient mSettingsClient;
-    private LocationRequest mLocationRequest;
-    private LocationSettingsRequest mLocationSettingsRequest;
-    private LocationCallback mLocationCallback;
-    private Location mCurrentLocation;
+    EditText description,landmark;
+    public Double Latitude;
+    public  Double Longitude;
     TextView tyextmain;
     Boolean getlocation = false;
+    private GoogleMap mMap;
+    private Dialog dilog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +67,14 @@ public class ComplainRegister extends AppCompatActivity implements LocationListe
 
         submit = (Button) findViewById(R.id.button);
         description = (EditText) findViewById(R.id.description);
+        landmark  = (EditText) findViewById(R.id.landmark);
         tyextmain = (TextView) findViewById(R.id.tyextmain);
+
+        getSupportActionBar().setTitle("Register Complaint");
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,6 +89,7 @@ public class ComplainRegister extends AppCompatActivity implements LocationListe
                     double latitude = locationTrack.getLatitude();
 
                     Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
+
                 } else {
 
                     locationTrack.showSettingsAlert();
@@ -86,8 +100,14 @@ public class ComplainRegister extends AppCompatActivity implements LocationListe
                 if(result == PackageManager.PERMISSION_GRANTED){
 
                     if(getlocation){
-                        FirebaseUser currentUser = mAuth.getCurrentUser();
-                        writeNewUser(currentUser.getEmail().replace("@", "").replace(".", ""), "new", "address", currentUser.getDisplayName());
+
+                        if(description.getText().toString().isEmpty() || landmark.getText().toString().isEmpty()){
+                            Toast.makeText(ComplainRegister.this, "Please Enter Fullditails", Toast.LENGTH_SHORT).show();
+                        }else{
+                            FirebaseUser currentUser = mAuth.getCurrentUser();
+                            writeNewUser(currentUser.getEmail().replace("@", "").replace(".", ""), description.getText().toString(), landmark.getText().toString(), currentUser.getDisplayName(),Latitude,Longitude);
+                        }
+
                     }else{
                         Toast.makeText(ComplainRegister.this, "Please Enable GPS and Internet", Toast.LENGTH_SHORT).show();
                         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -110,7 +130,19 @@ public class ComplainRegister extends AppCompatActivity implements LocationListe
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 1, this);
 
+            dilog = new  Dialog(ComplainRegister.this);
+            dilog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dilog.setCancelable(false);
+            dilog.setContentView(R.layout.dialog);
+            dilog.show();
+
+
         }else{
+            dilog = new  Dialog(ComplainRegister.this);
+            dilog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dilog.setCancelable(false);
+            dilog.setContentView(R.layout.dialog);
+            dilog.show();
 
             ActivityCompat.requestPermissions(this,
             new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.ACCESS_FINE_LOCATION},
@@ -122,8 +154,14 @@ public class ComplainRegister extends AppCompatActivity implements LocationListe
     }
 
 
-    private void writeNewUser(String emainid,String des, String adress,String username)  {
-        Complain user = new Complain(des, adress,username,false);
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    private void writeNewUser(String emainid, String des, String adress, String username,Double Latitude,Double Longitude)  {
+        Complain user = new Complain(des, adress,username,false ,Latitude,Longitude);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         String key = database.getReference("quiz").push().getKey();
         mDatabase.child("complains").child(emainid).child(key).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -132,6 +170,7 @@ public class ComplainRegister extends AppCompatActivity implements LocationListe
                 Log.e("sucess","suess");
                 Toast.makeText(ComplainRegister.this, "Add Complain Success Fully", Toast.LENGTH_SHORT).show();
                 description.setText("");
+                finish();
             }
         })
         .addOnFailureListener(new OnFailureListener() {
@@ -147,11 +186,18 @@ public class ComplainRegister extends AppCompatActivity implements LocationListe
 
         Log.e("getLatitude" ,Double.toString(location.getLatitude()));
         Log.e("getLongitude" , Double.toString(location.getLongitude()));
+        Latitude = location.getLatitude();
+        Longitude = location.getLongitude();
 
         getlocation = true;
-        tyextmain.setText("getLatitude:  - "+Double.toString(location.getLatitude())+"\n\n"+"getLongitude"+Double.toString(location.getLongitude()));
+        dilog.dismiss();
 
-        Toast.makeText(ComplainRegister.this, "Get Current Location", Toast.LENGTH_SHORT).show();
+//        tyextmain.setText("getLatitude:  - "+Double.toString(location.getLatitude())+"\n\n"+"getLongitude"+Double.toString(location.getLongitude()));
+
+        LatLng sydney = new LatLng(location.getLatitude(), location.getLongitude());
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker your Location"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,14.0f));
+//        Toast.makeText(ComplainRegister.this, "Get Current Location", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -218,5 +264,15 @@ public class ComplainRegister extends AppCompatActivity implements LocationListe
                 });
         final AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        // Add a marker in Sydney and move the camera
+//        LatLng sydney = new LatLng(-34, 151);
+//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,12.0f));
     }
 }

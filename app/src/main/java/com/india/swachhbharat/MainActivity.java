@@ -2,6 +2,7 @@ package com.india.swachhbharat;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,6 +32,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.india.dataset.Complain;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     Button Login,comlain,list;
     ProgressBar processbar;
-
+    JSONArray conpmail;
 
     private GoogleSignInClient mGoogleSignInClient;
     @Override
@@ -52,16 +55,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ActivityCompat.requestPermissions(MainActivity.this,
+                new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.ACCESS_FINE_LOCATION},
+                9000);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
+
         Login = (Button) findViewById(R.id.button);
         comlain = (Button) findViewById(R.id.comlain);
         list = (Button) findViewById(R.id.list);
         processbar = (ProgressBar) findViewById(R.id.processbar);
-
 
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         comlain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -77,27 +84,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        list.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, ListComplain.class));
+            }
+        });
+
+
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         mAuth = FirebaseAuth.getInstance();
 
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        database.child("complains").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List notes = new ArrayList<>();
-                for (DataSnapshot noteDataSnapshot : dataSnapshot.getChildren()) {
 
-                    Log.e("seeter",noteDataSnapshot.toString());
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-
-        });
     }
 
 
@@ -127,11 +126,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+
         // [START_EXCLUDE silent]
         // [END_EXCLUDE]
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -146,9 +148,9 @@ public class MainActivity extends AppCompatActivity {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                         }
-
                     }
-                });
+        });
+
 
     }
 
@@ -160,7 +162,9 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
+
                 // Google Sign In was successful, authenticate with Firebase
+
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 Log.e(TAG, account.getDisplayName());
                 Log.e(TAG, account.getEmail());
@@ -171,6 +175,8 @@ public class MainActivity extends AppCompatActivity {
                     comlain.setVisibility(View.VISIBLE);
                     Login.setVisibility(View.GONE);
                     processbar.setVisibility(View.GONE);
+
+
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
