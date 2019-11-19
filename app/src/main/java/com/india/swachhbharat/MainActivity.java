@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     // [END declare_auth]
 
-    Button Login,comlain,list;
+    Button Login,comlain,list,logout;
     ProgressBar processbar;
     JSONArray conpmail;
 
@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         Login = (Button) findViewById(R.id.button);
         comlain = (Button) findViewById(R.id.comlain);
         list = (Button) findViewById(R.id.list);
+        logout = (Button)findViewById(R.id.logout);
         processbar = (ProgressBar) findViewById(R.id.processbar);
 
         Login.setOnClickListener(new View.OnClickListener() {
@@ -88,7 +89,16 @@ public class MainActivity extends AppCompatActivity {
         list.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, ListComplain.class));
+                FirebaseUser currentUser = mAuth.getCurrentUser();
+                Log.e("usercheck" ,currentUser.getEmail());
+                Log.e("match",getResources().getString(R.string.admin));
+                if(currentUser.getEmail().equals(getResources().getString(R.string.admin))){
+                    startActivity(new Intent(MainActivity.this, ListComplainAdmin.class));
+                }else{
+
+                    startActivity(new Intent(MainActivity.this, ListComplain.class));
+                }
+
             }
         });
 
@@ -96,7 +106,12 @@ public class MainActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         mAuth = FirebaseAuth.getInstance();
 
-
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signOut();
+            }
+        });
     }
 
 
@@ -109,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
             Log.e("user",currentUser.getEmail());
             list.setVisibility(View.VISIBLE);
             comlain.setVisibility(View.VISIBLE);
+            logout.setVisibility(View.VISIBLE);
             processbar.setVisibility(View.GONE);
 
         }else{
@@ -173,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
 
                     list.setVisibility(View.VISIBLE);
                     comlain.setVisibility(View.VISIBLE);
+                    logout.setVisibility(View.VISIBLE);
                     Login.setVisibility(View.GONE);
                     processbar.setVisibility(View.GONE);
 
@@ -195,9 +212,19 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
 
+                        list.setVisibility(View.GONE);
+                        comlain.setVisibility(View.GONE);
+                        logout.setVisibility(View.GONE);
+                        Login.setVisibility(View.VISIBLE);
                     }
                 });
     }
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        moveTaskToBack(true);
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(1);
+    }
 }

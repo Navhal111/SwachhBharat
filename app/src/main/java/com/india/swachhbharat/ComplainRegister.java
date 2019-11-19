@@ -168,7 +168,7 @@ public class ComplainRegister extends AppCompatActivity implements LocationListe
             @Override
             public void onSuccess(Void aVoid) {
                 Log.e("sucess","suess");
-                Toast.makeText(ComplainRegister.this, "Add Complain Success Fully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ComplainRegister.this, "Add Complain Successfully", Toast.LENGTH_SHORT).show();
                 description.setText("");
                 finish();
             }

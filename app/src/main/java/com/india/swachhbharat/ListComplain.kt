@@ -33,27 +33,29 @@ class ListComplain : AppCompatActivity() {
 
         posts_recyclerview.layoutManager = LinearLayoutManager(this)
 
+        conpmail = JSONArray()
+        posts_recyclerview.adapter  =  Complain(conpmail)
         database.child("complains").child(currentUser!!.getEmail()!!.replace("@", "").replace(".", "")).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-
-                conpmail = JSONArray()
 
                 for (noteDataSnapshot in dataSnapshot.children) {
 
                     var jsonObject = JSONObject()
                     jsonObject.put("id",noteDataSnapshot.key)
+                    jsonObject.put("email",currentUser!!.getEmail()!!.replace("@", "").replace(".", ""))
                     jsonObject.put("username",noteDataSnapshot.child("username").value.toString())
                     jsonObject.put("des",noteDataSnapshot.child("des").value.toString())
                     jsonObject.put("approve",noteDataSnapshot.child("approve").value.toString())
                     jsonObject.put("adress",noteDataSnapshot.child("adress").value.toString())
                     jsonObject.put("Latitude",noteDataSnapshot.child("Latitude").value.toString())
+
                     jsonObject.put("Longitude",noteDataSnapshot.child("Longitude").value.toString())
                     conpmail.put(jsonObject)
+
                 }
 
                 Log.e("seeter",  conpmail.toString())
-
-                posts_recyclerview.adapter  =  Complain(conpmail)
+                posts_recyclerview.adapter!!.notifyDataSetChanged()
                 progress.visibility = View.GONE
 
             }
@@ -63,11 +65,47 @@ class ListComplain : AppCompatActivity() {
             }
 
         })
+
+        refreshLayout.setOnRefreshListener {
+            conpmail = JSONArray()
+            posts_recyclerview.adapter  =  Complain(conpmail)
+
+            database.child("complains").child(currentUser!!.getEmail()!!.replace("@", "").replace(".", "")).addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+
+                    for (noteDataSnapshot in dataSnapshot.children) {
+
+                        var jsonObject = JSONObject()
+                        jsonObject.put("id",noteDataSnapshot.key)
+                        jsonObject.put("email",currentUser!!.getEmail()!!.replace("@", "").replace(".", ""))
+                        jsonObject.put("username",noteDataSnapshot.child("username").value.toString())
+                        jsonObject.put("des",noteDataSnapshot.child("des").value.toString())
+                        jsonObject.put("approve",noteDataSnapshot.child("approve").value.toString())
+                        jsonObject.put("adress",noteDataSnapshot.child("adress").value.toString())
+                        jsonObject.put("Latitude",noteDataSnapshot.child("Latitude").value.toString())
+
+                        jsonObject.put("Longitude",noteDataSnapshot.child("Longitude").value.toString())
+                        conpmail.put(jsonObject)
+                    }
+
+                    Log.e("seeter",  conpmail.toString())
+
+                    posts_recyclerview.adapter!!.notifyDataSetChanged()
+                    progress.visibility = View.GONE
+                    refreshLayout.isRefreshing = false
+
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+
+                }
+
+            })
+        }
     }
 
 
     override fun onBackPressed() {
-        super.onBackPressed()
         finish()
     }
 

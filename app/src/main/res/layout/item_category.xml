@@ -69,6 +69,19 @@
                 android:visibility="gone"
                 android:layout_alignParentRight="true"/>
 
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/postimage"
+                android:gravity="center"
+                android:textSize="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/round_background_tag"
+                android:text="Solve"
+                android:textColor="@color/white"
+                android:padding="10dp" android:layout_alignParentRight="true"/>
+
         </RelativeLayout>
 
     </RelativeLayout>

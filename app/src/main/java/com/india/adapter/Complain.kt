@@ -42,6 +42,13 @@ class Complain (var name: JSONArray): RecyclerView.Adapter<Complain.ViewHolder>(
             var intent  = Intent(context1,ShowDitails::class.java)
             intent.putExtra("json",jsonObject.toString())
             context1.startActivity(intent)
+
+        }
+
+        if(jsonObject.getString("approve") == "true"){
+            holder.postimage.visibility = View.VISIBLE
+        }else{
+            holder.postimage.visibility = View.GONE
         }
     }
 
@@ -63,6 +70,7 @@ class Complain (var name: JSONArray): RecyclerView.Adapter<Complain.ViewHolder>(
         var post_username:TextView = itemView.find(R.id.post_username)
         var post_timestamp:TextView = itemView.find(R.id.post_timestamp)
         var card_image:CardView =itemView.find(R.id.card_image)
+        var postimage:TextView =itemView.find(R.id.postimage)
 
         init {
 
